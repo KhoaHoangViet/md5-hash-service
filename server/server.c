@@ -81,7 +81,7 @@ int main ()
 
     /*Receive File from Client */
     char* fr_name = "receive.txt";
-    FILE *fr = fopen(fr_name, "a");
+    FILE *fr = fopen(fr_name, "w");
     if(fr == NULL)
       printf("File %s Cannot be opened file on server.\n", fr_name);
     else
@@ -149,6 +149,7 @@ int main ()
         close(nsockfd);
         printf("[Server] Connection with Client closed. Server will wait now...\n");
         while(waitpid(-1, NULL, WNOHANG) > 0);
+        fclose(fs);
     //}
   }
 }

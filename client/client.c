@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
   /* Receive File from Server */
   printf("[Client] Receiveing file from Server and saving it as final.txt...");
   char* fr_name = "final.txt";
-  FILE *fr = fopen(fr_name, "a");
+  FILE *fr = fopen(fr_name, "w");
   if(fr == NULL)
     printf("File %s Cannot be opened.\n", fr_name);
   else
