@@ -54,7 +54,18 @@ int main(int argc, char *argv[])
   /* Send File to Server */
   //if(!fork())
   //{
-    char* fs_name = "input.txt";
+  char* fs_name;
+  if(argc == 1){
+    fs_name = "input.txt";
+  }
+  else if(argc == 2){
+    fs_name = argv[1];
+  }
+  else{
+    printf("Wrong argument input\n");
+    printf( "Usage: %s filename", argv[0] );
+    exit(0);
+  }
     char sdbuf[LENGTH];
     printf("[Client] Sending %s to the Server... ", fs_name);
     FILE *fs = fopen(fs_name, "r");
