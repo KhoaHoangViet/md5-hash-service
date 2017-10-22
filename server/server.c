@@ -86,11 +86,11 @@ int main ()
       printf("File %s Cannot be opened file on server.\n", fr_name);
     else
     {
-      bzero(revbuf, LENGTH);
+      bzero(revbuf, LENGTH); //erases the data in revbuf
       int fr_block_sz = 0;
       while((fr_block_sz = recv(nsockfd, revbuf, LENGTH, 0)) > 0)
       {
-          int write_sz = fwrite(revbuf, sizeof(char), fr_block_sz, fr);
+        int write_sz = fwrite(revbuf, sizeof(char), fr_block_sz, fr);
         if(write_sz < fr_block_sz)
           {
               error("File write failed on server.\n");
@@ -121,35 +121,32 @@ int main ()
     system("./md5.out");
 
     /* Send File to Client */
-    //if(!fork())
-    //{
-        char* fs_name = "output.txt";
-        char sdbuf[LENGTH]; // Send buffer
-        printf("[Server] Sending %s to the Client...", fs_name);
-        FILE *fs = fopen(fs_name, "r");
-        if(fs == NULL)
-        {
-            fprintf(stderr, "ERROR: File %s not found on server. (errno = %d)\n", fs_name, errno);
-        exit(1);
-        }
+    char* fs_name = "output.txt";
+    char sdbuf[LENGTH]; // Send buffer
+    printf("[Server] Sending %s to the Client...", fs_name);
+    FILE *fs = fopen(fs_name, "r");
+    if(fs == NULL)
+    {
+        fprintf(stderr, "ERROR: File %s not found on server. (errno = %d)\n", fs_name, errno);
+    exit(1);
+    }
 
-        bzero(sdbuf, LENGTH);
-        int fs_block_sz;
-        while((fs_block_sz = fread(sdbuf, sizeof(char), LENGTH, fs))>0)
+    bzero(sdbuf, LENGTH);
+    int fs_block_sz;
+    while((fs_block_sz = fread(sdbuf, sizeof(char), LENGTH, fs))>0)
+    {
+        if(send(nsockfd, sdbuf, fs_block_sz, 0) < 0)
         {
-            if(send(nsockfd, sdbuf, fs_block_sz, 0) < 0)
-            {
-                fprintf(stderr, "ERROR: Failed to send file %s. (errno = %d)\n", fs_name, errno);
-                exit(1);
-            }
-            bzero(sdbuf, LENGTH);
+            fprintf(stderr, "ERROR: Failed to send file %s. (errno = %d)\n", fs_name, errno);
+            exit(1);
         }
-        printf("Ok sent to client!\n");
-        success = 1;
-        close(nsockfd);
-        printf("[Server] Connection with Client closed. Server will wait now...\n");
-        while(waitpid(-1, NULL, WNOHANG) > 0);
-        fclose(fs);
-    //}
+        bzero(sdbuf, LENGTH);
+    }
+    printf("Ok sent to client!\n");
+    // success = 1;
+    close(nsockfd);
+    printf("[Server] Connection with Client closed. Server will wait now...\n");
+    while(waitpid(-1, NULL, WNOHANG) > 0);
+    fclose(fs);
   }
 }
